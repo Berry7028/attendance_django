@@ -1,0 +1,417 @@
+{% extends 'attendance/base.html' %}
+
+{% block title %}ダッシュボード | 勤怠管理システム{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .dashboard-header h1 {
+        font-size: 2.5rem;
+        margin: 0;
+        font-weight: bold;
+    }
+
+    .dashboard-date {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-top: 0.5rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #007bff;
+    }
+
+    .stat-card.success {
+        border-left-color: #28a745;
+    }
+
+    .stat-card.warning {
+        border-left-color: #ffc107;
+    }
+
+    .stat-card.danger {
+        border-left-color: #dc3545;
+    }
+
+    .stat-card.info {
+        border-left-color: #17a2b8;
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #333;
+        margin: 0.5rem 0;
+    }
+
+    .stat-label {
+        font-size: 0.95rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card.success .stat-icon {
+        color: #28a745;
+    }
+
+    .stat-card.warning .stat-icon {
+        color: #ffc107;
+    }
+
+    .stat-card.danger .stat-icon {
+        color: #dc3545;
+    }
+
+    .stat-card.info .stat-icon {
+        color: #17a2b8;
+    }
+
+    .attendance-table-wrapper {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .attendance-table {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .attendance-table thead {
+        background: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .attendance-table th {
+        padding: 1rem;
+        font-weight: 600;
+        color: #333;
+        vertical-align: middle;
+    }
+
+    .attendance-table td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .attendance-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .user-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .user-icon {
+        font-size: 1.5rem;
+        color: #007bff;
+    }
+
+    .user-name {
+        font-weight: 500;
+        color: #333;
+    }
+
+    .user-username {
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+    .time-cell {
+        font-family: 'Courier New', monospace;
+        color: #555;
+        font-weight: 500;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.5rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .badge-clock-in {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .badge-on-break {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .badge-clock-out {
+        background-color: #e2e3e5;
+        color: #383d41;
+    }
+
+    .badge-not-clocked {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .empty-cell {
+        color: #999;
+        font-style: italic;
+        text-align: center;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-buttons .btn-sm {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.85rem;
+    }
+
+    .refresh-button {
+        margin-bottom: 1.5rem;
+    }
+
+    .last-updated {
+        color: #999;
+        font-size: 0.9rem;
+        text-align: right;
+        margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+        }
+
+        .attendance-table th,
+        .attendance-table td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 0.35rem 0.5rem;
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- ダッシュボードヘッダー -->
+        <div class="dashboard-header">
+            <h1><i class="fas fa-tachometer-alt"></i> ダッシュボード</h1>
+            <div class="dashboard-date">{{ date|date:"Y年m月d日 (D)" }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+
+<!-- 統計カード -->
+<div class="stats-grid">
+    <div class="stat-card success">
+        <div class="stat-icon"><i class="fas fa-sign-in-alt"></i></div>
+        <div class="stat-value">{{ total_clocked_in }}</div>
+        <div class="stat-label">出勤中</div>
+    </div>
+
+    <div class="stat-card warning">
+        <div class="stat-icon"><i class="fas fa-pause-circle"></i></div>
+        <div class="stat-value">{{ total_on_break }}</div>
+        <div class="stat-label">休憩中</div>
+    </div>
+
+    <div class="stat-card info">
+        <div class="stat-icon"><i class="fas fa-sign-out-alt"></i></div>
+        <div class="stat-value">{{ total_clocked_out }}</div>
+        <div class="stat-label">退勤済</div>
+    </div>
+
+    <div class="stat-card danger">
+        <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
+        <div class="stat-value">{{ total_not_clocked }}</div>
+        <div class="stat-label">未出勤</div>
+    </div>
+</div>
+
+<!-- リフレッシュボタン -->
+<div class="refresh-button">
+    <button class="btn btn-primary" onclick="location.reload();">
+        <i class="fas fa-sync-alt"></i> 更新
+    </button>
+    <a href="{% url 'attendance:index' %}" class="btn btn-success">
+        <i class="fas fa-clock"></i> 打刻画面へ
+    </a>
+</div>
+
+<!-- 勤怠一覧表 -->
+<div class="attendance-table-wrapper">
+    <table class="table attendance-table table-hover">
+        <thead>
+            <tr>
+                <th>ユーザー</th>
+                <th>状態</th>
+                <th>出勤</th>
+                <th>退勤</th>
+                <th>休憩開始</th>
+                <th>休憩終了</th>
+                <th>実働時間</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in user_attendance_list %}
+                <tr>
+                    <!-- ユーザー名 -->
+                    <td>
+                        <div class="user-cell">
+                            <span class="user-icon"><i class="fas fa-user-circle"></i></span>
+                            <div>
+                                <div class="user-name">{{ item.user.get_full_name }}</div>
+                                <div class="user-username">{{ item.user.username }}</div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- ステータス -->
+                    <td>
+                        {% if item.record %}
+                            {% if item.record.is_clocked_in %}
+                                <span class="status-badge badge-clock-in">{{ item.status }}</span>
+                            {% elif item.record.is_on_break %}
+                                <span class="status-badge badge-on-break">{{ item.status }}</span>
+                            {% elif item.record.clock_in_time %}
+                                <span class="status-badge badge-clock-out">{{ item.status }}</span>
+                            {% else %}
+                                <span class="status-badge badge-not-clocked">{{ item.status }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="status-badge badge-not-clocked">{{ item.status }}</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- 出勤時刻 -->
+                    <td>
+                        {% if item.record and item.record.clock_in_time %}
+                            <span class="time-cell">{{ item.record.clock_in_time|time:"H:i:s" }}</span>
+                        {% else %}
+                            <span class="empty-cell">-</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- 退勤時刻 -->
+                    <td>
+                        {% if item.record and item.record.clock_out_time %}
+                            <span class="time-cell">{{ item.record.clock_out_time|time:"H:i:s" }}</span>
+                        {% else %}
+                            <span class="empty-cell">-</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- 休憩開始 -->
+                    <td>
+                        {% if item.record and item.record.break_start_time %}
+                            <span class="time-cell">{{ item.record.break_start_time|time:"H:i:s" }}</span>
+                        {% else %}
+                            <span class="empty-cell">-</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- 休憩終了 -->
+                    <td>
+                        {% if item.record and item.record.break_end_time %}
+                            <span class="time-cell">{{ item.record.break_end_time|time:"H:i:s" }}</span>
+                        {% else %}
+                            <span class="empty-cell">-</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- 実働時間 -->
+                    <td>
+                        {% if item.record and item.record.total_work_time %}
+                            <span class="time-cell">{{ item.total_work_hours }}h {{ item.total_work_minutes }}m</span>
+                        {% else %}
+                            <span class="empty-cell">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="last-updated">
+    最終更新: <strong id="last-updated-time"></strong>
+</div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 最終更新時刻を表示
+    function updateLastUpdatedTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('ja-JP');
+        document.getElementById('last-updated-time').textContent = timeString;
+    }
+
+    // ページ読み込み時と定期的に更新時刻を更新
+    updateLastUpdatedTime();
+    setInterval(updateLastUpdatedTime, 1000);
+
+    // 60秒ごとにページを自動更新
+    // setTimeout(() => {
+    //     location.reload();
+    // }, 60000);
+</script>
+{% endblock %}

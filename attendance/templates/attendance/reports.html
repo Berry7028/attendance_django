@@ -1,0 +1,313 @@
+{% extends 'attendance/base.html' %}
+
+{% block title %}レポート | 勤怠管理システム{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filter-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .filter-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .form-group-filter {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group-filter label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #555;
+    }
+
+    .filter-button-group {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+        grid-column: 1 / -1;
+    }
+
+    .filter-button-group .btn {
+        flex: 1;
+        padding: 0.6rem 1rem;
+    }
+
+    .export-button-group {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .export-button-group .btn {
+        flex: 1;
+    }
+
+    .report-table-wrapper {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .report-table {
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .report-table thead {
+        background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        border: none;
+    }
+
+    .report-table th {
+        padding: 1rem;
+        font-weight: 600;
+        text-align: left;
+        border: none;
+    }
+
+    .report-table td {
+        padding: 0.8rem 1rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .report-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .time-cell {
+        font-family: 'Courier New', monospace;
+        color: #555;
+        font-weight: 500;
+    }
+
+    .user-cell {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .user-username {
+        font-size: 0.85rem;
+        color: #999;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #999;
+    }
+
+    .empty-message-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .record-count {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        text-align: right;
+        color: #666;
+    }
+
+    @media (max-width: 768px) {
+        .filter-form {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-button-group {
+            flex-direction: column;
+        }
+
+        .filter-button-group .btn {
+            width: 100%;
+        }
+
+        .export-button-group {
+            flex-direction: column;
+        }
+
+        .export-button-group .btn {
+            width: 100%;
+        }
+
+        .report-table th,
+        .report-table td {
+            padding: 0.5rem;
+            font-size: 0.85rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="fas fa-file-alt"></i> 勤怠レポート</h1>
+
+        <!-- フィルター -->
+        <div class="filter-card">
+            <div class="filter-title">
+                <i class="fas fa-filter"></i> 検索条件
+            </div>
+            <form method="get" action="{% url 'attendance:reports' %}" class="filter-form">
+                <div class="form-group-filter">
+                    <label for="id_start_date">開始日</label>
+                    {{ form.start_date }}
+                </div>
+
+                <div class="form-group-filter">
+                    <label for="id_end_date">終了日</label>
+                    {{ form.end_date }}
+                </div>
+
+                <div class="form-group-filter">
+                    <label for="id_user">ユーザー</label>
+                    {{ form.user }}
+                </div>
+
+                <div class="filter-button-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> 検索
+                    </button>
+                    <a href="{% url 'attendance:reports' %}" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> リセット
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- エクスポートボタン -->
+        <div class="export-button-group">
+            <a href="{% url 'attendance:report_export_csv' %}{% if request.GET.urlencode %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-success">
+                <i class="fas fa-file-csv"></i> CSV エクスポート
+            </a>
+            <a href="{% url 'attendance:report_export_pdf' %}{% if request.GET.urlencode %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-danger">
+                <i class="fas fa-file-pdf"></i> PDF エクスポート
+            </a>
+        </div>
+
+        <!-- レポート表 -->
+        <div class="report-table-wrapper">
+            {% if records %}
+                <table class="table report-table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ユーザー</th>
+                            <th>日付</th>
+                            <th>出勤</th>
+                            <th>退勤</th>
+                            <th>休憩開始</th>
+                            <th>休憩終了</th>
+                            <th>実働時間</th>
+                            <th>休憩時間</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <span class="user-name">{{ record.user.get_full_name }}</span>
+                                        <span class="user-username">{{ record.user.username }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ record.date|date:"Y-m-d" }}</td>
+                                <td class="time-cell">
+                                    {% if record.clock_in_time %}
+                                        {{ record.clock_in_time|time:"H:i:s" }}
+                                    {% else %}
+                                        <span style="color: #ccc;">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="time-cell">
+                                    {% if record.clock_out_time %}
+                                        {{ record.clock_out_time|time:"H:i:s" }}
+                                    {% else %}
+                                        <span style="color: #ccc;">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="time-cell">
+                                    {% if record.break_start_time %}
+                                        {{ record.break_start_time|time:"H:i:s" }}
+                                    {% else %}
+                                        <span style="color: #ccc;">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="time-cell">
+                                    {% if record.break_end_time %}
+                                        {{ record.break_end_time|time:"H:i:s" }}
+                                    {% else %}
+                                        <span style="color: #ccc;">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="time-cell">
+                                    {% if record.total_work_time %}
+                                        {% with record.total_work_time.total_seconds|add:0 as total_seconds %}
+                                            {% widthratio total_seconds 3600 1 as hours %}
+                                            {% widthratio total_seconds 60 1 as total_minutes %}
+                                            {% widthratio total_minutes 60 1 as minutes %}
+                                            {{ hours }}:{{ minutes|stringformat:"02d" }}
+                                        {% endwith %}
+                                    {% else %}
+                                        <span style="color: #ccc;">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="time-cell">
+                                    {% if record.total_break_time %}
+                                        {% with record.total_break_time.total_seconds|add:0 as total_seconds %}
+                                            {% widthratio total_seconds 3600 1 as hours %}
+                                            {% widthratio total_seconds 60 1 as total_minutes %}
+                                            {% widthratio total_minutes 60 1 as minutes %}
+                                            {{ hours }}:{{ minutes|stringformat:"02d" }}
+                                        {% endwith %}
+                                    {% else %}
+                                        <span style="color: #ccc;">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="record-count">
+                    合計 <strong>{{ records.count }}</strong> 件の記録
+                </div>
+            {% else %}
+                <div class="empty-message">
+                    <div class="empty-message-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <p>検索条件に合致するレコードがありません</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

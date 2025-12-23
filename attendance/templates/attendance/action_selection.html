@@ -1,0 +1,337 @@
+{% extends 'attendance/base.html' %}
+
+{% block title %}アクション選択 | 勤怠管理システム{% endblock %}
+
+{% block extra_css %}
+<style>
+    .action-card {
+        border-radius: 15px;
+    }
+
+    .user-info-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .user-info-box .user-name {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 1rem 0;
+    }
+
+    .user-info-box .user-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .action-options {
+        padding: 2rem 0;
+    }
+
+    .action-option {
+        margin-bottom: 1.5rem;
+    }
+
+    .action-radio {
+        display: none;
+    }
+
+    .action-label {
+        display: block;
+        padding: 1.5rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .action-radio:checked + .action-label {
+        border-color: #007bff;
+        background: rgba(0, 123, 255, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    }
+
+    .action-label:hover {
+        border-color: #007bff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .action-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .action-text {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .action-description {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+
+    .action-clock-in .action-icon {
+        color: #28a745;
+    }
+
+    .action-radio:checked + .action-label.action-clock-in {
+        background: rgba(40, 167, 69, 0.1);
+        border-color: #28a745;
+    }
+
+    .action-clock-out .action-icon {
+        color: #6c757d;
+    }
+
+    .action-radio:checked + .action-label.action-clock-out {
+        background: rgba(108, 117, 125, 0.1);
+        border-color: #6c757d;
+    }
+
+    .action-break-start .action-icon {
+        color: #ffc107;
+    }
+
+    .action-radio:checked + .action-label.action-break-start {
+        background: rgba(255, 193, 7, 0.1);
+        border-color: #ffc107;
+    }
+
+    .action-break-end .action-icon {
+        color: #17a2b8;
+    }
+
+    .action-radio:checked + .action-label.action-break-end {
+        background: rgba(23, 162, 184, 0.1);
+        border-color: #17a2b8;
+    }
+
+    .status-info {
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .status-info h5 {
+        color: #007bff;
+        margin-bottom: 1rem;
+        font-weight: bold;
+    }
+
+    .status-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .status-row:last-child {
+        border-bottom: none;
+    }
+
+    .status-label {
+        font-weight: 600;
+        color: #555;
+    }
+
+    .status-value {
+        color: #333;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-submit {
+        flex: 1;
+    }
+
+    .btn-cancel {
+        flex: 0 0 auto;
+        padding: 0.8rem 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .user-info-box .user-name {
+            font-size: 1.5rem;
+        }
+
+        .action-label {
+            padding: 1rem;
+        }
+
+        .action-icon {
+            font-size: 2rem;
+        }
+
+        .action-text {
+            font-size: 1rem;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .btn-cancel {
+            flex: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card action-card">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-tasks"></i> アクション選択</h3>
+            </div>
+            <div class="card-body">
+                <!-- ユーザー情報 -->
+                <div class="user-info-box">
+                    <div class="user-icon">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-name">{{ user.get_full_name }}</div>
+                    <small>{{ user.username }}</small>
+                </div>
+
+                <!-- 現在のステータス -->
+                {% if today_record %}
+                    <div class="status-info">
+                        <h5><i class="fas fa-info-circle"></i> 本日のステータス</h5>
+                        <div class="status-row">
+                            <span class="status-label">現在の状態:</span>
+                            <span class="status-value">{{ today_record.get_status_display }}</span>
+                        </div>
+                        {% if today_record.clock_in_time %}
+                            <div class="status-row">
+                                <span class="status-label">出勤時刻:</span>
+                                <span class="status-value">{{ today_record.clock_in_time|time:"H:i:s" }}</span>
+                            </div>
+                        {% endif %}
+                        {% if today_record.clock_out_time %}
+                            <div class="status-row">
+                                <span class="status-label">退勤時刻:</span>
+                                <span class="status-value">{{ today_record.clock_out_time|time:"H:i:s" }}</span>
+                            </div>
+                        {% endif %}
+                        {% if today_record.break_start_time %}
+                            <div class="status-row">
+                                <span class="status-label">休憩開始:</span>
+                                <span class="status-value">{{ today_record.break_start_time|time:"H:i:s" }}</span>
+                            </div>
+                        {% endif %}
+                        {% if today_record.break_end_time %}
+                            <div class="status-row">
+                                <span class="status-label">休憩終了:</span>
+                                <span class="status-value">{{ today_record.break_end_time|time:"H:i:s" }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-calendar-alt"></i> 本日はまだ打刻がありません
+                    </div>
+                {% endif %}
+
+                <!-- アクション選択フォーム -->
+                <form method="post" action="{% url 'attendance:action_selection' %}">
+                    {% csrf_token %}
+
+                    <div class="action-options">
+                        <!-- clock_in -->
+                        <div class="action-option">
+                            <input
+                                type="radio"
+                                name="action"
+                                value="clock_in"
+                                id="action_clock_in"
+                                class="action-radio"
+                                {% if not today_record or not today_record.clock_in_time %}checked{% endif %}
+                            />
+                            <label for="action_clock_in" class="action-label action-clock-in">
+                                <span class="action-icon"><i class="fas fa-sign-in-alt"></i></span>
+                                <span class="action-text">出勤</span>
+                                <span class="action-description">勤務を開始します</span>
+                            </label>
+                        </div>
+
+                        <!-- clock_out -->
+                        <div class="action-option">
+                            <input
+                                type="radio"
+                                name="action"
+                                value="clock_out"
+                                id="action_clock_out"
+                                class="action-radio"
+                            />
+                            <label for="action_clock_out" class="action-label action-clock-out">
+                                <span class="action-icon"><i class="fas fa-sign-out-alt"></i></span>
+                                <span class="action-text">退勤</span>
+                                <span class="action-description">勤務を終了します</span>
+                            </label>
+                        </div>
+
+                        <!-- break_start -->
+                        <div class="action-option">
+                            <input
+                                type="radio"
+                                name="action"
+                                value="break_start"
+                                id="action_break_start"
+                                class="action-radio"
+                            />
+                            <label for="action_break_start" class="action-label action-break-start">
+                                <span class="action-icon"><i class="fas fa-pause-circle"></i></span>
+                                <span class="action-text">休憩開始</span>
+                                <span class="action-description">休憩時間に入ります</span>
+                            </label>
+                        </div>
+
+                        <!-- break_end -->
+                        <div class="action-option">
+                            <input
+                                type="radio"
+                                name="action"
+                                value="break_end"
+                                id="action_break_end"
+                                class="action-radio"
+                            />
+                            <label for="action_break_end" class="action-label action-break-end">
+                                <span class="action-icon"><i class="fas fa-play-circle"></i></span>
+                                <span class="action-text">休憩終了</span>
+                                <span class="action-description">休憩から戻ります</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- ボタングループ -->
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-success btn-submit btn-lg">
+                            <i class="fas fa-check"></i> 打刻確定
+                        </button>
+                        <a href="{% url 'attendance:clear_session' %}" class="btn btn-secondary btn-cancel">
+                            <i class="fas fa-times"></i> キャンセル
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
