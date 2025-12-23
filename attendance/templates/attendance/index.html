@@ -5,89 +5,62 @@
 {% block extra_css %}
 <style>
     .clocking-card {
-        border-radius: 15px;
+        margin-top: 2rem;
     }
 
     .clocking-section {
-        padding: 2rem;
+        padding: 1.5rem;
     }
 
     .user-select-wrapper {
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
 
     .form-control, .form-select {
-        font-size: 1.2rem;
-        padding: 0.8rem 1rem;
-        margin-bottom: 1rem;
+        padding: 0.6rem 0.75rem;
     }
 
     .btn-clock {
         width: 100%;
-        padding: 1rem;
-        font-size: 1.2rem;
-        font-weight: bold;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-
-    .btn-clock:active {
-        transform: scale(0.98);
-    }
-
-    .icon-large {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-    }
-
-    .clocking-icon {
-        font-size: 4rem;
-        margin: 2rem 0;
+        padding: 0.75rem;
+        font-weight: 600;
+        border-radius: 4px;
     }
 
     .info-section {
-        background: rgba(0, 123, 255, 0.1);
-        border-left: 4px solid #007bff;
-        padding: 1.5rem;
-        border-radius: 8px;
-        margin-top: 2rem;
+        background: #f8f9fa;
+        border: 1px solid var(--border-color);
+        padding: 1.25rem;
+        border-radius: 4px;
+        margin-top: 1.5rem;
     }
 
     .info-section h5 {
-        color: #007bff;
-        margin-bottom: 1rem;
-        font-weight: bold;
+        font-size: 1rem;
+        color: var(--text-color);
+        margin-bottom: 0.75rem;
+        font-weight: 600;
     }
 
     .instruction-list {
-        list-style: none;
-        padding: 0;
+        list-style: disc;
+        padding-left: 1.25rem;
+        margin-bottom: 0;
+        font-size: 0.9rem;
     }
 
     .instruction-list li {
-        padding: 0.5rem 0;
-        padding-left: 2rem;
-        position: relative;
-    }
-
-    .instruction-list li:before {
-        content: "✓";
-        position: absolute;
-        left: 0;
-        color: #28a745;
-        font-weight: bold;
-        font-size: 1.2rem;
+        padding: 0.25rem 0;
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-6 col-xl-5">
+    <div class="col-lg-5 col-md-8">
         <div class="card clocking-card">
-            <div class="card-header text-center">
-                <i class="fas fa-clock clocking-icon"></i>
-                <h2 class="mb-0">勤怠打刻</h2>
+            <div class="card-header">
+                打刻認証
             </div>
             <div class="card-body clocking-section">
                 <form method="post" action="{% url 'attendance:index' %}">
@@ -96,11 +69,11 @@
                     <!-- ユーザー選択 -->
                     <div class="user-select-wrapper">
                         <label for="{{ clocking_form.user.id_for_label }}" class="form-label">
-                            <i class="fas fa-user"></i> {{ clocking_form.user.label }}
+                            {{ clocking_form.user.label }}
                         </label>
                         {{ clocking_form.user }}
                         {% if clocking_form.user.errors %}
-                            <div class="alert alert-danger mt-2">
+                            <div class="text-danger small mt-1">
                                 {{ clocking_form.user.errors }}
                             </div>
                         {% endif %}
@@ -109,44 +82,41 @@
                     <!-- パスワード入力 -->
                     <div class="password-input-wrapper">
                         <label for="{{ clocking_form.password.id_for_label }}" class="form-label">
-                            <i class="fas fa-key"></i> {{ clocking_form.password.label }}
+                            {{ clocking_form.password.label }}
                         </label>
                         {{ clocking_form.password }}
                         {% if clocking_form.password.errors %}
-                            <div class="alert alert-danger mt-2">
+                            <div class="text-danger small mt-1">
                                 {{ clocking_form.password.errors }}
                             </div>
                         {% endif %}
                     </div>
 
                     <!-- 送信ボタン -->
-                    <div class="d-grid gap-2 mt-3">
+                    <div class="d-grid mt-4">
                         <button type="submit" class="btn btn-primary btn-clock">
-                            <i class="fas fa-sign-in-alt"></i> 次へ
+                            認証して次へ
                         </button>
                     </div>
                 </form>
 
                 <!-- 情報セクション -->
                 <div class="info-section">
-                    <h5><i class="fas fa-info-circle"></i> ご利用ガイド</h5>
+                    <h5>ご利用方法</h5>
                     <ul class="instruction-list">
                         <li>ドロップダウンからユーザーを選択してください</li>
-                        <li>パスワードを入力して「次へ」をクリック</li>
-                        <li>続いてアクションを選択して打刻完了</li>
-                        <li>毎日、出勤・退勤を記録してください</li>
+                        <li>パスワードを入力して認証を行ってください</li>
+                        <li>認証後、出勤・退勤などのアクションを選択できます</li>
                     </ul>
                 </div>
             </div>
         </div>
 
         <!-- テストユーザー情報 -->
-        <div class="alert alert-info mt-4">
-            <h5><i class="fas fa-users"></i> テストユーザー</h5>
-            <p class="mb-0">
-                <strong>ユーザー:</strong> user1, user2, user3<br>
-                <strong>パスワード:</strong> password123 (全ユーザー共通)<br>
-                <strong>管理者:</strong> admin / admin123
+        <div class="mt-4 p-3 bg-light border rounded" style="font-size: 0.85rem;">
+            <p class="mb-1 text-muted"><strong>テスト用アカウント:</strong></p>
+            <p class="mb-0 text-muted">
+                ユーザー: user1, user2, user3 / パスワード: password123
             </p>
         </div>
     </div>

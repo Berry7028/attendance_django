@@ -5,23 +5,24 @@
 {% block extra_css %}
 <style>
     .dashboard-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background-color: #fff;
+        border-bottom: 1px solid var(--border-color);
         padding: 2rem;
-        border-radius: 10px;
         margin-bottom: 2rem;
         text-align: center;
+        border-radius: 4px;
     }
 
     .dashboard-header h1 {
-        font-size: 2.5rem;
+        font-size: 2rem;
         margin: 0;
-        font-weight: bold;
+        font-weight: 600;
+        color: var(--text-color);
     }
 
     .dashboard-date {
-        font-size: 1.1rem;
-        opacity: 0.9;
+        font-size: 0.95rem;
+        color: #999;
         margin-top: 0.5rem;
     }
 
@@ -30,96 +31,114 @@
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1.5rem;
         margin-bottom: 2rem;
+        margin-left: 10px;
+        margin-right: 10px;
     }
 
     .stat-card {
         background: white;
-        border-radius: 10px;
+        border-radius: 4px;
         padding: 1.5rem;
         text-align: center;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        border-left: 4px solid #007bff;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        transition: box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
     .stat-card.success {
-        border-left-color: #28a745;
+        background: linear-gradient(135deg, rgba(39, 174, 96, 0.05) 0%, rgba(39, 174, 96, 0.02) 100%);
+        border-left: 4px solid #27ae60;
     }
 
     .stat-card.warning {
-        border-left-color: #ffc107;
+        background: linear-gradient(135deg, rgba(243, 156, 18, 0.05) 0%, rgba(243, 156, 18, 0.02) 100%);
+        border-left: 4px solid #f39c12;
     }
 
     .stat-card.danger {
-        border-left-color: #dc3545;
+        background: linear-gradient(135deg, rgba(192, 57, 43, 0.05) 0%, rgba(192, 57, 43, 0.02) 100%);
+        border-left: 4px solid #c0392b;
     }
 
     .stat-card.info {
-        border-left-color: #17a2b8;
+        background: linear-gradient(135deg, rgba(52, 152, 219, 0.05) 0%, rgba(52, 152, 219, 0.02) 100%);
+        border-left: 4px solid #3498db;
     }
 
     .stat-value {
         font-size: 2.5rem;
         font-weight: bold;
-        color: #333;
-        margin: 0.5rem 0;
+        color: var(--text-color);
+        margin: 0;
     }
 
     .stat-label {
-        font-size: 0.95rem;
-        color: #666;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        font-size: 0.85rem;
+        color: #999;
+        text-transform: none;
+        letter-spacing: 0;
     }
 
     .stat-icon {
         font-size: 2rem;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0;
     }
 
     .stat-card.success .stat-icon {
-        color: #28a745;
+        color: #27ae60;
     }
 
     .stat-card.warning .stat-icon {
-        color: #ffc107;
+        color: #f39c12;
     }
 
     .stat-card.danger .stat-icon {
-        color: #dc3545;
+        color: #c0392b;
     }
 
     .stat-card.info .stat-icon {
-        color: #17a2b8;
+        color: #3498db;
     }
 
     .attendance-table-wrapper {
         background: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         overflow: hidden;
+        margin-left: 10px;
+        margin-right: 10px;
     }
 
     .attendance-table {
         margin: 0;
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
 
     .attendance-table thead {
         background: #f8f9fa;
-        border-bottom: 2px solid #dee2e6;
+        border-bottom: 1px solid var(--border-color);
     }
 
     .attendance-table th {
-        padding: 1rem;
+        padding: 0.75rem 1rem;
         font-weight: 600;
-        color: #333;
+        color: var(--text-color);
         vertical-align: middle;
     }
 
     .attendance-table td {
-        padding: 1rem;
+        padding: 0.75rem 1rem;
         vertical-align: middle;
-        border-bottom: 1px solid #dee2e6;
+        border-bottom: 1px solid var(--border-color);
     }
 
     .attendance-table tbody tr:hover {
@@ -134,52 +153,53 @@
 
     .user-icon {
         font-size: 1.5rem;
-        color: #007bff;
+        color: #3498db;
     }
 
     .user-name {
         font-weight: 500;
-        color: #333;
+        color: var(--text-color);
     }
 
     .user-username {
         font-size: 0.85rem;
-        color: #666;
+        color: #999;
     }
 
     .time-cell {
         font-family: 'Courier New', monospace;
-        color: #555;
+        color: var(--text-color);
         font-weight: 500;
+        font-size: 0.9rem;
     }
 
     .status-badge {
         display: inline-block;
-        padding: 0.5rem 0.75rem;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 0.85rem;
         text-align: center;
     }
 
     .badge-clock-in {
-        background-color: #d4edda;
-        color: #155724;
+        background-color: rgba(39, 174, 96, 0.1);
+        color: #27ae60;
     }
 
     .badge-on-break {
-        background-color: #fff3cd;
-        color: #856404;
+        background-color: rgba(243, 156, 18, 0.1);
+        color: #f39c12;
     }
 
     .badge-clock-out {
-        background-color: #e2e3e5;
-        color: #383d41;
+        background-color: rgba(149, 165, 166, 0.1);
+        color: #95a5a6;
     }
 
     .badge-not-clocked {
-        background-color: #f8d7da;
-        color: #721c24;
+        background-color: rgba(192, 57, 43, 0.1);
+        color: #c0392b;
     }
 
     .empty-cell {
@@ -200,6 +220,8 @@
 
     .refresh-button {
         margin-bottom: 1.5rem;
+        margin-left: 10px;
+        margin-right: 10px;
     }
 
     .last-updated {
@@ -207,6 +229,7 @@
         font-size: 0.9rem;
         text-align: right;
         margin-top: 1rem;
+        margin-right: 10px;
     }
 
     @media (max-width: 768px) {
