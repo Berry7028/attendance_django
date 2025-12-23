@@ -5,16 +5,18 @@
 {% block extra_css %}
 <style>
     .dashboard-header {
-        background-color: #fff;
-        border-bottom: 1px solid var(--border-color);
-        padding: 2rem;
+        background-color: var(--surface-color);
+        border: 1px solid var(--border-color);
+        padding: 2.25rem;
         margin-bottom: 2rem;
         text-align: center;
-        border-radius: 4px;
+        border-radius: 18px;
+        position: relative;
+        overflow: hidden;
     }
 
     .dashboard-header h1 {
-        font-size: 2rem;
+        font-size: 2.1rem;
         margin: 0;
         font-weight: 600;
         color: var(--text-color);
@@ -22,7 +24,7 @@
 
     .dashboard-date {
         font-size: 0.95rem;
-        color: #999;
+        color: var(--muted-color);
         margin-top: 0.5rem;
     }
 
@@ -36,53 +38,63 @@
     }
 
     .stat-card {
-        background: white;
-        border-radius: 4px;
+        background: #fff;
+        border-radius: 16px;
         padding: 1.5rem;
         text-align: center;
         border: 1px solid var(--border-color);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        box-shadow: var(--shadow-soft);
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 0.5rem;
-        transition: box-shadow 0.2s;
+        transition: box-shadow 0.2s, transform 0.2s;
+        position: relative;
+        overflow: hidden;
     }
 
     .stat-card:hover {
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 12px 26px rgba(31, 35, 40, 0.1);
+        transform: translateY(-2px);
     }
 
     .stat-card.success {
-        background: linear-gradient(135deg, rgba(39, 174, 96, 0.05) 0%, rgba(39, 174, 96, 0.02) 100%);
-        border-left: 4px solid #27ae60;
+        --stat-accent: var(--success-color);
     }
 
     .stat-card.warning {
-        background: linear-gradient(135deg, rgba(243, 156, 18, 0.05) 0%, rgba(243, 156, 18, 0.02) 100%);
-        border-left: 4px solid #f39c12;
+        --stat-accent: var(--warning-color);
     }
 
     .stat-card.danger {
-        background: linear-gradient(135deg, rgba(192, 57, 43, 0.05) 0%, rgba(192, 57, 43, 0.02) 100%);
-        border-left: 4px solid #c0392b;
+        --stat-accent: var(--danger-color);
     }
 
     .stat-card.info {
-        background: linear-gradient(135deg, rgba(52, 152, 219, 0.05) 0%, rgba(52, 152, 219, 0.02) 100%);
-        border-left: 4px solid #3498db;
+        --stat-accent: var(--secondary-color);
+    }
+
+    .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 4px;
+        width: 100%;
+        background: var(--stat-accent, var(--primary-color));
     }
 
     .stat-value {
-        font-size: 2.5rem;
+        font-size: 2.6rem;
         font-weight: bold;
         color: var(--text-color);
         margin: 0;
+        font-family: var(--heading-font);
     }
 
     .stat-label {
         font-size: 0.85rem;
-        color: #999;
+        color: var(--muted-color);
         text-transform: none;
         letter-spacing: 0;
     }
@@ -92,27 +104,11 @@
         margin-bottom: 0;
     }
 
-    .stat-card.success .stat-icon {
-        color: #27ae60;
-    }
-
-    .stat-card.warning .stat-icon {
-        color: #f39c12;
-    }
-
-    .stat-card.danger .stat-icon {
-        color: #c0392b;
-    }
-
-    .stat-card.info .stat-icon {
-        color: #3498db;
-    }
-
     .attendance-table-wrapper {
         background: white;
-        border-radius: 4px;
+        border-radius: 16px;
         border: 1px solid var(--border-color);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        box-shadow: var(--shadow-soft);
         overflow: hidden;
         margin-left: 10px;
         margin-right: 10px;
@@ -124,7 +120,7 @@
     }
 
     .attendance-table thead {
-        background: #f8f9fa;
+        background: #f3ede5;
         border-bottom: 1px solid var(--border-color);
     }
 
@@ -142,7 +138,7 @@
     }
 
     .attendance-table tbody tr:hover {
-        background: #f8f9fa;
+        background: #f6f1ea;
     }
 
     .user-cell {
@@ -163,7 +159,7 @@
 
     .user-username {
         font-size: 0.85rem;
-        color: #999;
+        color: var(--muted-color);
     }
 
     .time-cell {
@@ -176,34 +172,39 @@
     .status-badge {
         display: inline-block;
         padding: 0.4rem 0.8rem;
-        border-radius: 4px;
+        border-radius: 999px;
         font-weight: 500;
         font-size: 0.85rem;
         text-align: center;
+        border: 1px solid transparent;
     }
 
     .badge-clock-in {
-        background-color: rgba(39, 174, 96, 0.1);
-        color: #27ae60;
+        background-color: rgba(47, 125, 91, 0.12);
+        color: var(--success-color);
+        border-color: rgba(47, 125, 91, 0.2);
     }
 
     .badge-on-break {
-        background-color: rgba(243, 156, 18, 0.1);
-        color: #f39c12;
+        background-color: rgba(201, 128, 43, 0.12);
+        color: var(--warning-color);
+        border-color: rgba(201, 128, 43, 0.2);
     }
 
     .badge-clock-out {
-        background-color: rgba(149, 165, 166, 0.1);
-        color: #95a5a6;
+        background-color: rgba(111, 107, 99, 0.12);
+        color: var(--muted-color);
+        border-color: rgba(111, 107, 99, 0.2);
     }
 
     .badge-not-clocked {
-        background-color: rgba(192, 57, 43, 0.1);
-        color: #c0392b;
+        background-color: rgba(184, 67, 62, 0.12);
+        color: var(--danger-color);
+        border-color: rgba(184, 67, 62, 0.2);
     }
 
     .empty-cell {
-        color: #999;
+        color: var(--muted-color);
         font-style: italic;
         text-align: center;
     }
@@ -218,14 +219,18 @@
         font-size: 0.85rem;
     }
 
-    .refresh-button {
+    .refresh-area {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
         margin-bottom: 1.5rem;
         margin-left: 10px;
         margin-right: 10px;
     }
 
     .last-updated {
-        color: #999;
+        color: var(--muted-color);
         font-size: 0.9rem;
         text-align: right;
         margin-top: 1rem;
