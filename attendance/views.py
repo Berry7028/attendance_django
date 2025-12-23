@@ -310,6 +310,8 @@ def report_export_pdf(request):
     from reportlab.lib.units import inch
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
     from reportlab.lib import colors
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.cidfonts import UnicodeCIDFont
     from datetime import datetime as dt
     from io import BytesIO
     from django.http import HttpResponse
@@ -345,6 +347,10 @@ def report_export_pdf(request):
     doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=20, bottomMargin=20)
     elements = []
 
+    # 日本語フォントを登録（CIDフォント）
+    jp_font = 'HeiseiKakuGo-W5'
+    pdfmetrics.registerFont(UnicodeCIDFont(jp_font))
+
     # スタイル設定
     styles = getSampleStyleSheet()
     title_style = ParagraphStyle(
@@ -354,6 +360,7 @@ def report_export_pdf(request):
         textColor=colors.HexColor('#007bff'),
         spaceAfter=12,
         alignment=1,  # Center
+        fontName=jp_font,
     )
 
     # タイトル
@@ -363,7 +370,9 @@ def report_export_pdf(request):
 
     # 生成日時
     now = dt.now().strftime('%Y年%m月%d日 %H:%M:%S')
-    info = Paragraph(f'生成日時: {now}', styles['Normal'])
+    normal_style = styles['Normal'].clone('JapaneseNormal')
+    normal_style.fontName = jp_font
+    info = Paragraph(f'生成日時: {now}', normal_style)
     elements.append(info)
     elements.append(Spacer(1, 0.2*inch))
 
@@ -396,12 +405,13 @@ def report_export_pdf(request):
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#007bff')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTNAME', (0, 0), (-1, 0), jp_font),
         ('FONTSIZE', (0, 0), (-1, 0), 10),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
         ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
         ('FONTSIZE', (0, 1), (-1, -1), 8),
+        ('FONTNAME', (0, 1), (-1, -1), jp_font),
     ]))
     elements.append(table)
 
