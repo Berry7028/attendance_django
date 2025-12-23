@@ -78,12 +78,17 @@ def clock_action(request, user_id, action):
 
     try:
         if action == 'clock_in':
-            if record.clock_in_time:
-                messages.warning(request, f'{user.get_full_name()}は既に出勤しています。')
+            if record.clock_out_time:
+                # 退勤済みの場合は退勤時刻をクリアして出勤中に戻す
+                record.clock_out_time = None
+                record.save()
+                messages.success(request, f"{user.get_full_name()}を出勤中に戻しました。")
+            elif record.clock_in_time:
+                messages.warning(request, f"{user.get_full_name()}は既に出勤しています。")
             else:
                 record.clock_in_time = now
                 record.save()
-                messages.success(request, f'{user.get_full_name()}が出勤しました。({now.strftime("%H:%M:%S")})')
+                messages.success(request, f"{user.get_full_name()}が出勤しました。({now.strftime('%H:%M:%S')})")
 
         elif action == 'clock_out':
             if not record.clock_in_time:

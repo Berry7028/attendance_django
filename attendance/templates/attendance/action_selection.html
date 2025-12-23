@@ -214,7 +214,7 @@
                                 value="clock_in"
                                 id="action_clock_in"
                                 class="action-radio"
-                                {% if not today_record or not today_record.clock_in_time %}checked{% endif %}
+                                {% if not today_record or not today_record.clock_in_time or today_record.clock_out_time %}checked{% endif %}
                             />
                             <label for="action_clock_in" class="action-label">
                                 <span class="action-icon text-success"><i class="fas fa-sign-in-alt"></i></span>
@@ -231,6 +231,7 @@
                                 value="break_start"
                                 id="action_break_start"
                                 class="action-radio"
+                                {% if today_record.is_clocked_in and not today_record.is_on_break and not today_record.break_start_time %}checked{% endif %}
                             />
                             <label for="action_break_start" class="action-label">
                                 <span class="action-icon text-warning"><i class="fas fa-pause"></i></span>
@@ -247,6 +248,7 @@
                                 value="break_end"
                                 id="action_break_end"
                                 class="action-radio"
+                                {% if today_record.is_on_break %}checked{% endif %}
                             />
                             <label for="action_break_end" class="action-label">
                                 <span class="action-icon text-info"><i class="fas fa-play"></i></span>
@@ -263,6 +265,7 @@
                                 value="clock_out"
                                 id="action_clock_out"
                                 class="action-radio"
+                                {% if today_record.is_clocked_in and not today_record.is_on_break and today_record.break_end_time %}checked{% endif %}
                             />
                             <label for="action_clock_out" class="action-label">
                                 <span class="action-icon text-secondary"><i class="fas fa-sign-out-alt"></i></span>
