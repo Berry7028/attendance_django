@@ -5,12 +5,14 @@
 {% block extra_css %}
 <style>
     .clocking-card {
-        margin: 2rem auto 0;
-        max-width: 520px;
+        margin: 0 auto;
+        max-width: 650px;
+        min-width: 320px;
+        width: 100%;
     }
 
     .clocking-section {
-        padding: 2rem;
+        padding: 2rem 2.5rem;
     }
 
     .user-select-wrapper {
@@ -56,7 +58,6 @@
         padding-left: 1.25rem;
         margin-bottom: 0;
         font-size: 0.9rem;
-        word-break: keep-all;
     }
 
     .instruction-list li {
@@ -68,7 +69,7 @@
         border: 1px dashed var(--border-color);
         border-radius: 12px;
         font-size: 0.85rem;
-        max-width: 520px;
+        max-width: 650px;
         margin-left: auto;
         margin-right: auto;
     }
@@ -76,8 +77,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-5 col-md-8">
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-lg-7 col-md-10">
         <div class="card clocking-card">
             <div class="card-header">
                 打刻認証
