@@ -267,9 +267,8 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <!-- ダッシュボードヘッダー -->
         <div class="dashboard-header">
-            <h1><i class="fas fa-tachometer-alt"></i> ダッシュボード</h1>
+            <h1>ダッシュボード</h1>
             <div class="dashboard-date">{{ date|date:"Y年m月d日 (D)" }}</div>
         </div>
     </div>
@@ -278,46 +277,44 @@
 <div class="row">
     <div class="col-12">
 
-<!-- 統計カード -->
 <div class="stats-grid">
     <div class="stat-card success">
-        <div class="stat-icon"><i class="fas fa-sign-in-alt"></i></div>
-        <div class="stat-value">{{ total_clocked_in }}</div>
         <div class="stat-label">出勤中</div>
+        <div class="stat-value">{{ total_clocked_in }}</div>
     </div>
 
     <div class="stat-card warning">
-        <div class="stat-icon"><i class="fas fa-pause-circle"></i></div>
-        <div class="stat-value">{{ total_on_break }}</div>
         <div class="stat-label">休憩中</div>
+        <div class="stat-value">{{ total_on_break }}</div>
     </div>
 
     <div class="stat-card info">
-        <div class="stat-icon"><i class="fas fa-sign-out-alt"></i></div>
-        <div class="stat-value">{{ total_clocked_out }}</div>
         <div class="stat-label">退勤済</div>
+        <div class="stat-value">{{ total_clocked_out }}</div>
     </div>
 
     <div class="stat-card danger">
-        <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
-        <div class="stat-value">{{ total_not_clocked }}</div>
         <div class="stat-label">未出勤</div>
+        <div class="stat-value">{{ total_not_clocked }}</div>
     </div>
 </div>
 
-<!-- リフレッシュボタン -->
-<div class="refresh-button">
-    <button class="btn btn-primary" onclick="location.reload();">
-        <i class="fas fa-sync-alt"></i> 更新
-    </button>
-    <a href="{% url 'attendance:index' %}" class="btn btn-success">
-        <i class="fas fa-clock"></i> 打刻画面へ
-    </a>
+<div class="refresh-area">
+    <div>
+        <button class="btn btn-outline-secondary btn-sm" onclick="location.reload();">
+            表示を更新
+        </button>
+        <a href="{% url 'attendance:index' %}" class="btn btn-primary btn-sm ms-2">
+            打刻画面へ
+        </a>
+    </div>
+    <div class="last-updated">
+        最終更新: <span id="last-updated-time"></span>
+    </div>
 </div>
 
-<!-- 勤怠一覧表 -->
 <div class="attendance-table-wrapper">
-    <table class="table attendance-table table-hover">
+    <table class="table attendance-table">
         <thead>
             <tr>
                 <th>ユーザー</th>
@@ -326,24 +323,16 @@
                 <th>退勤</th>
                 <th>休憩開始</th>
                 <th>休憩終了</th>
-                <th>実働時間</th>
+                <th>実働</th>
             </tr>
         </thead>
         <tbody>
             {% for item in user_attendance_list %}
                 <tr>
-                    <!-- ユーザー名 -->
                     <td>
-                        <div class="user-cell">
-                            <span class="user-icon"><i class="fas fa-user-circle"></i></span>
-                            <div>
-                                <div class="user-name">{{ item.user.get_full_name }}</div>
-                                <div class="user-username">{{ item.user.username }}</div>
-                            </div>
-                        </div>
+                        <div class="user-name">{{ item.user.get_full_name }}</div>
+                        <div class="user-username">{{ item.user.username }}</div>
                     </td>
-
-                    <!-- ステータス -->
                     <td>
                         {% if item.record %}
                             {% if item.record.is_clocked_in %}
@@ -359,50 +348,30 @@
                             <span class="status-badge badge-not-clocked">{{ item.status }}</span>
                         {% endif %}
                     </td>
-
-                    <!-- 出勤時刻 -->
-                    <td>
+                    <td class="time-cell">
                         {% if item.record and item.record.clock_in_time %}
-                            <span class="time-cell">{{ item.record.clock_in_time|time:"H:i:s" }}</span>
-                        {% else %}
-                            <span class="empty-cell">-</span>
-                        {% endif %}
+                            {{ item.record.clock_in_time|time:"H:i" }}
+                        {% else %}-{% endif %}
                     </td>
-
-                    <!-- 退勤時刻 -->
-                    <td>
+                    <td class="time-cell">
                         {% if item.record and item.record.clock_out_time %}
-                            <span class="time-cell">{{ item.record.clock_out_time|time:"H:i:s" }}</span>
-                        {% else %}
-                            <span class="empty-cell">-</span>
-                        {% endif %}
+                            {{ item.record.clock_out_time|time:"H:i" }}
+                        {% else %}-{% endif %}
                     </td>
-
-                    <!-- 休憩開始 -->
-                    <td>
+                    <td class="time-cell">
                         {% if item.record and item.record.break_start_time %}
-                            <span class="time-cell">{{ item.record.break_start_time|time:"H:i:s" }}</span>
-                        {% else %}
-                            <span class="empty-cell">-</span>
-                        {% endif %}
+                            {{ item.record.break_start_time|time:"H:i" }}
+                        {% else %}-{% endif %}
                     </td>
-
-                    <!-- 休憩終了 -->
-                    <td>
+                    <td class="time-cell">
                         {% if item.record and item.record.break_end_time %}
-                            <span class="time-cell">{{ item.record.break_end_time|time:"H:i:s" }}</span>
-                        {% else %}
-                            <span class="empty-cell">-</span>
-                        {% endif %}
+                            {{ item.record.break_end_time|time:"H:i" }}
+                        {% else %}-{% endif %}
                     </td>
-
-                    <!-- 実働時間 -->
-                    <td>
+                    <td class="time-cell">
                         {% if item.record and item.record.total_work_time %}
-                            <span class="time-cell">{{ item.total_work_hours }}h {{ item.total_work_minutes }}m</span>
-                        {% else %}
-                            <span class="empty-cell">-</span>
-                        {% endif %}
+                            {{ item.total_work_hours }}h {{ item.total_work_minutes }}m
+                        {% else %}-{% endif %}
                     </td>
                 </tr>
             {% endfor %}

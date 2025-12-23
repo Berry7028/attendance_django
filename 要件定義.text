@@ -1,0 +1,74 @@
+要件定義
+
+使う技術たち
+django
+python3.12
+sqlite3
+
+UI
+bootstrap5
+tailwindcss
+fontawesome
+
+
+
+勤怠管理のアプリを作成したいです
+まず初めにプランを作成してくっださい
+
+必要な機能は
+出勤、退勤、休憩入り、休憩もどり
+それをUI上でどのくらいかが見れるようにして下さい
+
+また全体の状況が見れるようなダッシュボードも作成してください
+
+命名規則は統一で
+UIコメントアウトは全て日本語で書くようにして下さい
+
+仮想環境を作成して
+pip install django
+django-admin startproject attendance .
+python manage.py startapp attendance
+これで最初の環境を構築して下さい
+
+DB
+# DB設計
+## ユーザーテーブル (User)
+- id: 整数 (PK)
+- username: 文字列
+- password: 文字列
+- email: 文字列
+- is_active: 論理値
+- is_staff: 論理値
+- created_at: 日時
+- updated_at: 日時
+
+## 勤怠記録テーブル (AttendanceRecord)
+- id: 整数 (PK)
+- user_id: 整数 (UserテーブルのFK)
+- date: 日付
+- clock_in_time: 時刻 (出勤時間)
+- clock_out_time: 時刻 (退勤時間)
+- break_start_time: 時刻 (休憩開始時間)
+- break_end_time: 時刻 (休憩終了時間)
+- total_work_time: 時間（実働時間）
+- total_break_time: 時間（休憩時間）
+- created_at: 日時
+- updated_at: 日時
+
+## 会社/チームテーブル（※必要な場合のみ）
+- id: 整数 (PK)
+- name: 文字列
+- created_at: 日時
+- updated_at: 日時
+
+
+
+必要であればWEB検索やcontext7のmcpを活用してdocsから情報を取得して下さい
+
+
+
+UI的にはユーザーを選択、日付を選択、出勤、退勤、休憩入り、休憩もどりを選択するようなUIにして下さい
+
+ユーザーは管理者が追加をする
+
+それぞれのユーザーを選択する時にはそのユーザーに設定されたパスワードを入力するようにします

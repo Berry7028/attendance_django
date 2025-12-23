@@ -6,135 +6,99 @@
 <style>
     .filter-card {
         background: white;
-        border-radius: 10px;
-        padding: 1.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 1.25rem;
         margin-bottom: 2rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .filter-title {
-        font-size: 1.3rem;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 1rem;
     }
 
     .filter-form {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
         gap: 1.5rem;
     }
 
     .form-group-filter {
-        display: flex;
-        flex-direction: column;
+        flex: 1;
+        min-width: 200px;
     }
 
     .form-group-filter label {
+        font-size: 0.85rem;
         font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: #555;
+        margin-bottom: 0.25rem;
+        color: #7f8c8d;
     }
 
     .filter-button-group {
         display: flex;
-        gap: 1rem;
+        gap: 0.75rem;
         align-items: flex-end;
-        grid-column: 1 / -1;
-    }
-
-    .filter-button-group .btn {
-        flex: 1;
-        padding: 0.6rem 1rem;
     }
 
     .export-button-group {
         display: flex;
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-
-    .export-button-group .btn {
-        flex: 1;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
     }
 
     .report-table-wrapper {
         background: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
     }
 
     .report-table {
         margin: 0;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
     }
 
     .report-table thead {
-        background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
-        color: white;
-        border: none;
+        background: #f8f9fa;
+        color: #7f8c8d;
     }
 
     .report-table th {
-        padding: 1rem;
+        background: #f8f9fa;
+        color: #7f8c8d;
         font-weight: 600;
-        text-align: left;
-        border: none;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border-color);
     }
 
     .report-table td {
-        padding: 0.8rem 1rem;
-        border-bottom: 1px solid #dee2e6;
-    }
-
-    .report-table tbody tr:hover {
-        background: #f8f9fa;
-    }
-
-    .time-cell {
-        font-family: 'Courier New', monospace;
-        color: #555;
-        font-weight: 500;
-    }
-
-    .user-cell {
-        display: flex;
-        flex-direction: column;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
     }
 
     .user-name {
         font-weight: 600;
-        color: #333;
     }
 
     .user-username {
-        font-size: 0.85rem;
-        color: #999;
+        font-size: 0.8rem;
+        color: #95a5a6;
     }
 
-    .empty-message {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: #999;
-    }
-
-    .empty-message-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
+    .time-cell {
+        font-variant-numeric: tabular-nums;
     }
 
     .record-count {
-        margin-top: 1rem;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+        color: #95a5a6;
         text-align: right;
-        color: #666;
     }
 
     @media (max-width: 768px) {
@@ -170,115 +134,71 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h1 class="mb-4"><i class="fas fa-file-alt"></i> 勤怠レポート</h1>
+        <h1 class="mb-4 h4">勤怠レポート</h1>
 
         <!-- フィルター -->
         <div class="filter-card">
-            <div class="filter-title">
-                <i class="fas fa-filter"></i> 検索条件
-            </div>
+            <div class="filter-title">検索条件</div>
             <form method="get" action="{% url 'attendance:reports' %}" class="filter-form">
                 <div class="form-group-filter">
-                    <label for="id_start_date">開始日</label>
+                    <label>開始日</label>
                     {{ form.start_date }}
                 </div>
 
                 <div class="form-group-filter">
-                    <label for="id_end_date">終了日</label>
+                    <label>終了日</label>
                     {{ form.end_date }}
                 </div>
 
                 <div class="form-group-filter">
-                    <label for="id_user">ユーザー</label>
+                    <label>ユーザー</label>
                     {{ form.user }}
                 </div>
 
                 <div class="filter-button-group">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search"></i> 検索
-                    </button>
-                    <a href="{% url 'attendance:reports' %}" class="btn btn-secondary">
-                        <i class="fas fa-redo"></i> リセット
-                    </a>
+                    <button type="submit" class="btn btn-primary btn-sm">検索</button>
+                    <a href="{% url 'attendance:reports' %}" class="btn btn-outline-secondary btn-sm">リセット</a>
                 </div>
             </form>
         </div>
 
         <!-- エクスポートボタン -->
         <div class="export-button-group">
-            <a href="{% url 'attendance:report_export_csv' %}{% if request.GET.urlencode %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-success">
-                <i class="fas fa-file-csv"></i> CSV エクスポート
+            <a href="{% url 'attendance:report_export_csv' %}{% if request.GET.urlencode %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-outline-success btn-sm">
+                CSV出力
             </a>
-            <a href="{% url 'attendance:report_export_pdf' %}{% if request.GET.urlencode %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-danger">
-                <i class="fas fa-file-pdf"></i> PDF エクスポート
+            <a href="{% url 'attendance:report_export_pdf' %}{% if request.GET.urlencode %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-outline-danger btn-sm">
+                PDF出力
             </a>
         </div>
 
         <!-- レポート表 -->
         <div class="report-table-wrapper">
             {% if records %}
-                <table class="table report-table table-hover">
+                <table class="table report-table">
                     <thead>
                         <tr>
                             <th>ユーザー</th>
                             <th>日付</th>
                             <th>出勤</th>
                             <th>退勤</th>
-                            <th>休憩開始</th>
-                            <th>休憩終了</th>
-                            <th>実働時間</th>
-                            <th>休憩時間</th>
+                            <th>休憩</th>
+                            <th>実働</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for record in records %}
                             <tr>
                                 <td>
-                                    <div class="user-cell">
-                                        <span class="user-name">{{ record.user.get_full_name }}</span>
-                                        <span class="user-username">{{ record.user.username }}</span>
-                                    </div>
+                                    <div class="user-name">{{ record.user.get_full_name }}</div>
+                                    <div class="user-username">{{ record.user.username }}</div>
                                 </td>
                                 <td>{{ record.date|date:"Y-m-d" }}</td>
                                 <td class="time-cell">
-                                    {% if record.clock_in_time %}
-                                        {{ record.clock_in_time|time:"H:i:s" }}
-                                    {% else %}
-                                        <span style="color: #ccc;">-</span>
-                                    {% endif %}
+                                    {{ record.clock_in_time|time:"H:i"|default:"-" }}
                                 </td>
                                 <td class="time-cell">
-                                    {% if record.clock_out_time %}
-                                        {{ record.clock_out_time|time:"H:i:s" }}
-                                    {% else %}
-                                        <span style="color: #ccc;">-</span>
-                                    {% endif %}
-                                </td>
-                                <td class="time-cell">
-                                    {% if record.break_start_time %}
-                                        {{ record.break_start_time|time:"H:i:s" }}
-                                    {% else %}
-                                        <span style="color: #ccc;">-</span>
-                                    {% endif %}
-                                </td>
-                                <td class="time-cell">
-                                    {% if record.break_end_time %}
-                                        {{ record.break_end_time|time:"H:i:s" }}
-                                    {% else %}
-                                        <span style="color: #ccc;">-</span>
-                                    {% endif %}
-                                </td>
-                                <td class="time-cell">
-                                    {% if record.total_work_time %}
-                                        {% with record.total_work_time.total_seconds|add:0 as total_seconds %}
-                                            {% widthratio total_seconds 3600 1 as hours %}
-                                            {% widthratio total_seconds 60 1 as total_minutes %}
-                                            {% widthratio total_minutes 60 1 as minutes %}
-                                            {{ hours }}:{{ minutes|stringformat:"02d" }}
-                                        {% endwith %}
-                                    {% else %}
-                                        <span style="color: #ccc;">-</span>
-                                    {% endif %}
+                                    {{ record.clock_out_time|time:"H:i"|default:"-" }}
                                 </td>
                                 <td class="time-cell">
                                     {% if record.total_break_time %}
@@ -288,23 +208,28 @@
                                             {% widthratio total_minutes 60 1 as minutes %}
                                             {{ hours }}:{{ minutes|stringformat:"02d" }}
                                         {% endwith %}
-                                    {% else %}
-                                        <span style="color: #ccc;">-</span>
-                                    {% endif %}
+                                    {% else %}-{% endif %}
+                                </td>
+                                <td class="time-cell">
+                                    {% if record.total_work_time %}
+                                        {% with record.total_work_time.total_seconds|add:0 as total_seconds %}
+                                            {% widthratio total_seconds 3600 1 as hours %}
+                                            {% widthratio total_seconds 60 1 as total_minutes %}
+                                            {% widthratio total_minutes 60 1 as minutes %}
+                                            {{ hours }}:{{ minutes|stringformat:"02d" }}
+                                        {% endwith %}
+                                    {% else %}-{% endif %}
                                 </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 <div class="record-count">
-                    合計 <strong>{{ records.count }}</strong> 件の記録
+                    該当件数: {{ records.count }} 件
                 </div>
             {% else %}
-                <div class="empty-message">
-                    <div class="empty-message-icon">
-                        <i class="fas fa-inbox"></i>
-                    </div>
-                    <p>検索条件に合致するレコードがありません</p>
+                <div class="p-5 text-center text-muted">
+                    検索条件に一致するデータが見つかりませんでした。
                 </div>
             {% endif %}
         </div>
