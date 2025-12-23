@@ -6,6 +6,9 @@
 <style>
     .action-card {
         border-radius: 16px;
+        max-width: 850px;
+        margin: 0 auto;
+        width: 100%;
     }
 
     .user-info-box {
@@ -45,6 +48,9 @@
         cursor: pointer;
         transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
         background: white;
+        min-height: 4.5rem;
+        width: 100%;
+        gap: 0.5rem;
     }
 
     .action-radio:checked + .action-label {
@@ -59,15 +65,18 @@
 
     .action-icon {
         font-size: 1.25rem;
-        margin-right: 1rem;
+        margin-right: 0.5rem;
         width: 2rem;
         text-align: center;
+        flex-shrink: 0;
     }
 
     .action-text {
         font-size: 1.1rem;
         font-weight: 600;
         color: var(--text-color);
+        flex-shrink: 0;
+        white-space: nowrap;
     }
 
     .action-description {
@@ -118,14 +127,17 @@
 
     @media (max-width: 768px) {
         .action-label {
-            flex-direction: column;
-            align-items: flex-start;
             padding: 1rem;
+            min-height: 5rem;
         }
         
+        .action-text {
+            font-size: 1rem;
+        }
+
         .action-description {
-            margin-left: 0;
-            margin-top: 0.25rem;
+            font-size: 0.8rem;
+            text-align: right;
         }
 
         .button-group {
@@ -136,8 +148,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-7 mx-auto">
+<div class="row justify-content-center align-items-center g-0" style="min-height: 70vh; width: 100%;">
+    <div class="col-12 col-sm-11 col-md-11 col-lg-10" style="max-width: 900px;">
         <div class="card action-card">
             <div class="card-header">
                 打刻アクションの選択
